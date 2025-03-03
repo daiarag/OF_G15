@@ -39,4 +39,16 @@ function [] = blockMeshMaker(nAngles, radialExpansion, rectExpansion,...
     fprintf(fid, "FoamFile\n{\n\tversion:\t2.0;\n\tformat\tascii;\n"...
         +"\tclass\tdictionary;\n\tobject:\tblockMeshDict;\n}\n\n");
     fprintf(fid, "convertToMeters:\t1.0;\n\n");
-    % Vertex determination
+    fprinf(fid, "vertices\n(\n");
+    % Vertex determination - cylinder first
+    theta = 360 / nAngles; % angle increment
+    % Wall vertices
+    for i = 0:nAngles - 1
+        fprintf(fid, "\t(%1.8f %2.8f %3.2f) \\\\%4.1f\n", 0.5 * cosd(theta...
+            * i), 0.5 * sind(theta * i), 0, i);
+    end
+    % Outer radius vertices
+    for i = 0:nAngles - 1
+        fprintf(fid, "\t(%1.8f %2.8f %3.2f) \\\\%4.1f\n", (0.5 + R) * ...
+            cosd(theta * i), (0.5 + R) * sind(theta * i), 0, i + 8);
+    end
