@@ -19,7 +19,7 @@
 function [] = blockMeshMaker(param)
     arguments
         param.nAngles double {mustBeInteger, mustBeFinite, mustBeScalarOrEmpty,...
-            mustBeGreaterThan(nAngles, 7)} = 8;
+            mustBeGreaterThan(param.nAngles, 7)} = 8;
         param.radialExpansion (1, 2) double {mustBeRow, mustBeFinite,...
             mustBePositive} = [2 1];
         param.rectExpansion (1, 2) double {mustBeRow, mustBeFinite, ...
@@ -58,7 +58,7 @@ function [] = blockMeshMaker(param)
                 * i), n, i + k + total);
         end
         k = k + i + 1; % For total counter
-        % Back domain vertices
+        % Top-back domain vertices
         i = 0; % Checking when to terminate
         while (cosd(i * theta) > 0)
             fprintf(fid, "\t(%1.8f %2.8f %3.2f) \\\\%4.1f\n", Lw, ...
@@ -70,7 +70,7 @@ function [] = blockMeshMaker(param)
         k = k + i; % For total counter
         % Top domain vertices
         if (mod(param.nAngles, 4) == 0)
-            for (j = 1:-1)
+            for j = 1:-1
                 fprintf(fid, "\t(%1.8f %2.8f %3.2f) \\\\%4.1f\n", (0.5 +...
                     param.R) * cosd(90 - theta * j), param.H, n, k + 1 -...
                     j + total);
@@ -97,4 +97,22 @@ function [] = blockMeshMaker(param)
         fprintf(fid, "\t(%1.8f %2.8f %3.2f) \\\\%4.1f\n", param.Lw, ...
             -param.H, n, k + j + 1 + total); % Bottom-left corner
         k = k + j + 2; % For total counter
+        % Bottom domain vertices
+        if (mod(param.nAngles, 4) == 0)
+            for j = 1:-1
+                fprintf(fid, "\t(%1.8f %2.8f %3.2f) \\\\%4.1f\n", (0.5 +...
+                    param.R) * cosd(270 - theta * j), -param.H, n, k + 1 -...
+                    j + total);
+            end
+            k = k + 3;
+        else
+            fprintf(fid, "\t(%1.8f %2.8f %3.2f) \\\\%4.1f\n", (0.5 + ...
+                param.R) * cosd(theta * i - 1), -param.H, n, k + total);
+            fprintf(fid, "\t(%1.8f %2.8f %3.2f) \\\\%4.1f\n", (0.5 + ...
+                param.R) * cosd(theta * i), -param.H, n, k + total + 1);
+            k = k + 2;
+        end
+        fprintf(fid, "\t(%1.8f %2.8f %3.2f) \\\\%4.1f\n", param.Lw, ...
+            -param.H, n, k + total); % Bottom-right corner
+        k = k + 1; % For total counter
     end
