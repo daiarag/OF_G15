@@ -11,7 +11,7 @@
 % R = radial size (measured in cylinder diameters) (default is 1)
 % H = half-domain height (measured in cylinder diameters) (default is 5)
 % rectExpansion = vector for expansion ratios [horz vert] (z = 1) (default
-% is [4 1])
+% is [4 4])
 % boxCellCount = vector for number of cells fore and aft [fore aft] (z = 1)
 % (default is [15 30])
 % The function will save a file to MATLAB directory (where this function
@@ -33,7 +33,7 @@ function [] = blockMeshMaker(param)
         param.rCellCount (1, 2) double {mustBeRow, mustBeFinite,...
             mustBePositive, mustBeInteger} = [10 20];
         param.rectExpansion (1, 2) double {mustBeRow, mustBeFinite, ...
-            mustBePositive} = [4 1];
+            mustBePositive} = [4 4];
         param.Lf double {mustBeReal, mustBeFinite, mustBeScalarOrEmpty,...
             mustBePositive} = 4;
         param.Lw double {mustBeReal, mustBeFinite, mustBeScalarOrEmpty,...
@@ -42,7 +42,7 @@ function [] = blockMeshMaker(param)
             mustBePositive} = 1;
         param.H double {mustBeReal, mustBeFinite, mustBeScalarOrEmpty,...
             mustBePositive} = 5;
-        param.wCellCount (1, 2) double {mustBeRow, mustBeFinite,...
+        param.boxCellCount (1, 2) double {mustBeRow, mustBeFinite,...
             mustBePositive, mustBeInteger} = [15 30];
     end
     % Prevent buggy meshes
@@ -59,6 +59,7 @@ function [] = blockMeshMaker(param)
     % Vertex determination - cylinder first
     theta = 360 / param.nAngles; % angle increment
     vertices = zeros(16 + 6 * param.nAngles, 3); % Matrix to hold vertices
+    arcCenters = zeros(2 * param.nAngles, 3); % Matrix to hold arc midpoints
     zCounter = length(vertices) / 2;
     k = 1; % For indexing
     % Circular vertices
@@ -66,10 +67,14 @@ function [] = blockMeshMaker(param)
         % Cylinder
         vertices(i + 1, :) = [0.5 * cosd(theta * i) ...
             0.5 * sind(theta * i) -0.5];
+        arcCenters(i + 1, :) = [0.5 * cosd(theta * (i + 0.5)) ...
+            0.5 * sind(theta * (i + 0.5)) -0.5];
         % Outer ring
         vertices(i + param.nAngles + 1, :) = [(0.5 + ...
             param.R) * cosd(theta * i) (0.5 + param.R) * sind(theta...
             * i) -0.5];
+        arcCenters(i + param.nAngles + 1, :) = [0.5 * cosd(theta * (i + 0.5)) ...
+            0.5 * sind(theta * (i + 0.5)) -0.5];
     end
     k = k + 2 * (i + 1);
     % Top-back domain vertices
@@ -164,6 +169,7 @@ function [] = blockMeshMaker(param)
             param.rCellCount(2), param.radialExpansion(1), ...
             param.radialExpansion(2));
     end
+    % Last block in circular ring
     fprintf(fid, "\t\\\\ block %.0f\n", param.nAngles - 1);
     fprintf(fid, "\thex (%.0f %.0f %.0f %.0f %.0f %.0f %.0f %.0f) (%.0f"...
         + " %.0f 1) simpleGrading (%.10f %.10f 1)\n", param.nAngles - 1,...
@@ -171,5 +177,39 @@ function [] = blockMeshMaker(param)
         - 1, 2 * param.nAngles + zCounter - 1, param.nAngles + zCounter,...
         zCounter, param.rCellCount(1), param.rCellCount(2),...
         param.radialExpansion(1), param.radialExpansion(2));
+    % Remaining blocks
+    % We start with blocks from x-axis to first square block
+    % Find the top-right corner
+    stop = find(vertices(:, 2) < param.H, 1, "last") - 1;
+    % Ascend from x-axis
+    for i = 2 * param.nAngles:stop - 2
+        fprintf(fid, "\t\\\\ block %.0f\n", i - param.nAngles);
+        fprintf(fid, "\thex (%.0f %.0f %.0f %.0f %.0f %.0f %.0f"...
+            + " %.0f) (%.0f %.0f 1) simpleGrading (%.10f %.10f"... 
+            + " 1)\n", i - param.nAngles, i, i + 1, i - param.nAngles + 1,...
+            i - param.nAngles + zCounter, i + zCounter, i + 1 + zCounter...
+            , i + zCounter + 1 - param.nAngles, param.boxCellCount(2),...
+            param.rCellCount(2), param.rectExpansion(1), ...
+            param.radialExpansion(2));
+    end
+    % Top-right block
+    fprintf(fid, "\t\\\\ block %.0f\n", stop - param.nAngles - 1);
+    fprintf(fid, "\thex (%.0f %.0f %.0f %.0f %.0f %.0f %.0f %.0f) (%.0f"...
+        + " %.0f 1) simpleGrading (%.10f %.10f 1)\n", stop - param.nAngles...
+        - 1, stop - 1, stop, stop + 1, stop - param.nAngles + zCounter - 1,...
+        stop + zCounter - 1, stop + zCounter, stop + zCounter,...
+        param.boxCellCount(2), param.boxCellCount(2), ...
+        param.rectExpansion(1), param.rectExpansion(2));
+    % Now we move to the left edge of the domain
+    % Find the top-left corner
+    stop = find(vertices(:, 1) > -param.Lf, 1, "last") - 1;
+    % Go left from top-right block
+    for i = 1:2
+
+    end
     fprintf(fid, ");\n\n");
     fclose(fid); % Close file
+    disp("Number of vertices:");
+    disp(length(vertices));
+    disp("Number of radial blocks:");
+    disp(param.nAngles);
