@@ -4,12 +4,16 @@
 % value is 8)
 % radialExpansion = vector for expansion ratios [radial angular] (z = 1)
 % (default is [2 1])
+% rCellCount = vector for number of cells in each direction [radial
+% angular] (z = 1) (default is [10 20])
 % Lf = fore distance (measured in cylinder diameters) (default is 4)
 % Lw = wake distance (measured in cylinder diameters) (default is 6)
 % R = radial size (measured in cylinder diameters) (default is 1)
 % H = half-domain height (measured in cylinder diameters) (default is 5)
 % rectExpansion = vector for expansion ratios [horz vert] (z = 1) (default
 % is [4 1])
+% boxCellCount = vector for number of cells fore and aft [fore aft] (z = 1)
+% (default is [15 30])
 % The function will save a file to MATLAB directory (where this function
 % rests) and display the following:
 % Number of vertices
@@ -26,6 +30,8 @@ function [] = blockMeshMaker(param)
             mustBeGreaterThan(param.nAngles, 7)} = 8;
         param.radialExpansion (1, 2) double {mustBeRow, mustBeFinite,...
             mustBePositive} = [2 1];
+        param.rCellCount (1, 2) double {mustBeRow, mustBeFinite,...
+            mustBePositive, mustBeInteger} = [10 20];
         param.rectExpansion (1, 2) double {mustBeRow, mustBeFinite, ...
             mustBePositive} = [4 1];
         param.Lf double {mustBeReal, mustBeFinite, mustBeScalarOrEmpty,...
@@ -36,6 +42,8 @@ function [] = blockMeshMaker(param)
             mustBePositive} = 1;
         param.H double {mustBeReal, mustBeFinite, mustBeScalarOrEmpty,...
             mustBePositive} = 5;
+        param.wCellCount (1, 2) double {mustBeRow, mustBeFinite,...
+            mustBePositive, mustBeInteger} = [15 30];
     end
     % Prevent buggy meshes
     try
@@ -44,7 +52,7 @@ function [] = blockMeshMaker(param)
         assert(param.H > param.R + 0.5);
     catch
         myExc = MException('MATLAB:blockMeshMaker:boundary', ...
-            "Parameters Lf, Lw, and H must be larger than cylinder boundaries.");
+            "Parameters Lf, Lw, and H must be larger than outer shell.");
         throw(myExc);
     end
     fid = fopen("blockMeshDict", "w+"); % Create new file to write to
@@ -140,7 +148,28 @@ function [] = blockMeshMaker(param)
     fprintf(fid, "convertToMeters:\t1.0;\n\n");
     % Print vertices from list
     fprintf(fid, "vertices\n(\n");
-    fprintf(fid, "\t(%1.10f %2.10f %3.10f) \\\\%4.0f\n", [vertices'; ...
+    fprintf(fid, "\t(%.10f %.10f %.10f) \\\\ %.0f\n", [vertices'; ...
         0:15 + 6 * param.nAngles]);
+    fprintf(fid, ");\n\n");
+    % Print blocks
+    fprintf(fid, "blocks\n(\n");
+    % Circular ring
+    for i = 0:param.nAngles - 2
+        fprintf(fid, "\t\\\\ block %.0f\n", i);
+        fprintf(fid, "\thex (%.0f %.0f %.0f %.0f %.0f %.0f %.0f"...
+            + " %.0f) (%.0f %.0f 1) simpleGrading (%.10f %.10f"... 
+            + " 1)\n", i, i + param.nAngles, i + param.nAngles + 1, i + 1,...
+            i + zCounter, i + zCounter + param.nAngles, i + zCounter...
+            + param.nAngles + 1, i + zCounter + 1, param.rCellCount(1),...
+            param.rCellCount(2), param.radialExpansion(1), ...
+            param.radialExpansion(2));
+    end
+    fprintf(fid, "\t\\\\ block %.0f\n", param.nAngles - 1);
+    fprintf(fid, "\thex (%.0f %.0f %.0f %.0f %.0f %.0f %.0f %.0f) (%.0f"...
+        + " %.0f 1) simpleGrading (%.10f %.10f 1)\n", param.nAngles - 1,...
+        2 * param.nAngles - 1, param.nAngles, 0, param.nAngles + zCounter...
+        - 1, 2 * param.nAngles + zCounter - 1, param.nAngles + zCounter,...
+        zCounter, param.rCellCount(1), param.rCellCount(2),...
+        param.radialExpansion(1), param.radialExpansion(2));
     fprintf(fid, ");\n\n");
     fclose(fid); % Close file
