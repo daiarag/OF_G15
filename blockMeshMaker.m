@@ -69,4 +69,18 @@ function [] = blockMeshMaker(nAngles, radialExpansion, rectExpansion,...
         fprintf(fid, "\t(%1.8f %2.8f %3.2f) \\\\%4.1f\n", Lw, H, n, i...
                 + 2 * nAngles + total + 1); % Top-right corner
         k = k + i + 1; % For total counter
+        % Top domain vertices
+        if (mod(nAngles, 4) == 0)
+            for (i = 1:-1)
+                fprintf(fid, "\t(%1.8f %2.8f %3.2f) \\\\%4.1f\n", (0.5 + R) ...
+                * cosd(90 - theta * i), H, n, k + 1 - i + total);
+            end
+            k = k + 3;
+        else
+            fprintf(fid, "\t(%1.8f %2.8f %3.2f) \\\\%4.1f\n", (0.5 + R) ...
+                * cosd(theta * i - 1), H, n, i + 2 * nAngles + total + 1);
+            fprintf(fid, "\t(%1.8f %2.8f %3.2f) \\\\%4.1f\n", (0.5 + R) ...
+                * cosd(theta * i), H, n, i + 2 * nAngles + total + 2);
+            k = k + 2;
+        end
     end
