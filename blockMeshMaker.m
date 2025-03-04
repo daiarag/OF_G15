@@ -42,13 +42,31 @@ function [] = blockMeshMaker(nAngles, radialExpansion, rectExpansion,...
     fprinf(fid, "vertices\n(\n");
     % Vertex determination - cylinder first
     theta = 360 / nAngles; % angle increment
-    % Wall vertices
-    for i = 0:nAngles - 1
-        fprintf(fid, "\t(%1.8f %2.8f %3.2f) \\\\%4.1f\n", 0.5 * cosd(theta...
-            * i), 0.5 * sind(theta * i), 0, i);
-    end
-    % Outer radius vertices
-    for i = 0:nAngles - 1
-        fprintf(fid, "\t(%1.8f %2.8f %3.2f) \\\\%4.1f\n", (0.5 + R) * ...
-            cosd(theta * i), (0.5 + R) * sind(theta * i), 0, i + 8);
+    total = 0; % For labeling vertices
+    k = 0; % For total counter
+    % First front, then back
+    for n = 0:1
+        % Wall vertices
+        for i = 0:nAngles - 1
+            fprintf(fid, "\t(%1.8f %2.8f %3.2f) \\\\%4.1f\n", 0.5 * ...
+                cosd(theta * i), 0.5 * sind(theta * i), n, i + total);
+        end
+        k = i + 1; % For total counter
+        % Outer radius vertices
+        for i = 0:nAngles - 1
+            fprintf(fid, "\t(%1.8f %2.8f %3.2f) \\\\%4.1f\n", (0.5 + R) ...
+                * cosd(theta * i), (0.5 + R) * sind(theta * i), n, i...
+                + nAngles + total);
+        end
+        k = k + i + 1; % For total counter
+        % Back domain vertices
+        i = 0; % Checking when to terminate
+        while (cos(i * theta) > 0)
+            fprintf(fid, "\t(%1.8f %2.8f %3.2f) \\\\%4.1f\n", Lw, ...
+                (0.5 + R) * sind(theta * i), n, i + 2 * nAngles + total);
+            i = i + 1;
+        end
+        fprintf(fid, "\t(%1.8f %2.8f %3.2f) \\\\%4.1f\n", Lw, H, n, i...
+                + 2 * nAngles + total + 1); % Top-right corner
+        k = k + i + 1; % For total counter
     end
