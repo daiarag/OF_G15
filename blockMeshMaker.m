@@ -37,6 +37,16 @@ function [] = blockMeshMaker(param)
         param.H double {mustBeReal, mustBeFinite, mustBeScalarOrEmpty,...
             mustBePositive} = 5;
     end
+    % Prevent buggy meshes
+    try
+        assert(param.Lf > param.R + 0.5);
+        assert(param.Lw > param.R + 0.5);
+        assert(param.H > param.R + 0.5);
+    catch
+        myExc = MException('MATLAB:blockMeshMaker:boundary', ...
+            "Parameters Lf, Lw, and H must be larger than cylinder boundaries.");
+        throw(myExc);
+    end
     fid = fopen("blockMeshDict", "w+"); % Create new file to write to
     % Vertex determination - cylinder first
     theta = 360 / param.nAngles; % angle increment
@@ -121,8 +131,9 @@ function [] = blockMeshMaker(param)
         j = j + 1;
     end
     vertices(zCounter + 1:end, :) = [vertices(1:zCounter, 1:2) ...
-        0.5 * ones(zCounter, 1)];
-    plot(vertices(1:zCounter, 1), vertices(1:zCounter, 2), 'o');
+        0.5 * ones(zCounter, 1)]; % Duplicate for out-of-plane points
+    % Uncomment this line to plot points
+    % plot(vertices(1:zCounter, 1), vertices(1:zCounter, 2), 'o');
     % Constant lines of every blockMeshDict
     fprintf(fid, "FoamFile\n{\n\tversion:\t2.0;\n\tformat:\tascii;\n"...
         +"\tclass:\tdictionary;\n\tobject:\tblockMeshDict;\n}\n\n");
