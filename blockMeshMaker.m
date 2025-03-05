@@ -318,5 +318,87 @@ function [] = blockMeshMaker(param)
             0.5);
     end
     fprintf(fid, ");\n\n");
-    % Now for faces
+    % Now for faces - we go from top to bottom, left to right, and CCW for
+    % cylinder faces
+    fprintf(fid, "boundary\n(\n");
+    fprintf(fid, "\tinlet\n\t{\n");
+    fprintf(fid, "\t\ttype patch;\n");
+    fprintf(fid, "\t\tfaces\n\t\t(\n");
+    % Inlet faces
+    % Find inlet vertices
+    edge = find(vertices(1:zCounter, 1) < 0.001 - param.Lf) - 1;
+    disp("Number of inlet faces:");
+    disp(length(edge) - 1);
+    % Write rectangles
+    for i = 1:length(edge) - 1
+        fprintf(fid, "\t\t\t(%.0f %.0f %.0f %.0f)\n", edge(i), edge(i) +...
+            zCounter, edge(i + 1) + zCounter, edge(i + 1));
+    end
+    fprintf(fid, "\t\t);\n");
+    fprintf(fid, "\t}\n");
+    fprintf(fid, "\toutlet\n\t{\n");
+    fprintf(fid, "\t\ttype patch;\n");
+    fprintf(fid, "\t\tfaces\n\t\t(\n");
+    % Outlet faces
+    % Find outlet vertices
+    edge = find(vertices(1:zCounter, 1) > param.Lw - 0.001) - 1;
+    disp("Number of outlet faces:");
+    disp(length(edge) - 1);
+    % Top to bottom ordering
+    edge = flip(edge);
+    edge = [edge(edge < 3 * param.nAngles); edge(edge > 3 * param.nAngles)];
+    % Write rectangles
+    for i = 1:length(edge) - 1
+        fprintf(fid, "\t\t\t(%.0f %.0f %.0f %.0f)\n", edge(i), edge(i) +...
+            zCounter, edge(i + 1) + zCounter, edge(i + 1));
+    end
+    fprintf(fid, "\t\t);\n");
+    fprintf(fid, "\t}\n");
+    fprintf(fid, "\ttop\n\t{\n");
+    fprintf(fid, "\t\ttype symmetryPlane;\n");
+    fprintf(fid, "\t\tfaces\n\t\t(\n");
+    % Top faces
+    % Find top vertices
+    edge = find(vertices(1:zCounter, 2) > param.H - 0.001) - 1;
+    disp("Number of top faces:");
+    disp(length(edge) - 1);
+    edge = flip(edge);
+    % Write rectangles
+    for i = 1:length(edge) - 1
+        fprintf(fid, "\t\t\t(%.0f %.0f %.0f %.0f)\n", edge(i), edge(i) +...
+            zCounter, edge(i + 1) + zCounter, edge(i + 1));
+    end
+    fprintf(fid, "\t\t);\n");
+    fprintf(fid, "\t}\n");
+    fprintf(fid, "\tbottom\n\t{\n");
+    fprintf(fid, "\t\ttype symmetryPlane;\n");
+    fprintf(fid, "\t\tfaces\n\t\t(\n");
+    % Bottom faces
+    % Find bottom vertices
+    edge = find(vertices(1:zCounter, 2) < 0.001 - param.H) - 1;
+    disp("Number of bottom faces:");
+    disp(length(edge) - 1);
+    % Write rectangles
+    for i = 1:length(edge) - 1
+        fprintf(fid, "\t\t\t(%.0f %.0f %.0f %.0f)\n", edge(i), edge(i) +...
+            zCounter, edge(i + 1) + zCounter, edge(i + 1));
+    end
+    fprintf(fid, "\t\t);\n");
+    fprintf(fid, "\t}\n");
+    fprintf(fid, "\tcylinder\n\t{\n");
+    fprintf(fid, "\t\ttype wall;\n");
+    fprintf(fid, "\t\tfaces\n\t\t(\n");
+    % Cylinder faces
+    for i = 0:param.nAngles - 2
+        fprintf(fid, "\t\t\t(%.0f %.0f %.0f %.0f)\n", i, i + zCounter, i +...
+            1 + zCounter, i + 1);
+    end
+    fprintf(fid, "\t\t\t(%.0f %.0f %.0f %.0f)\n", param.nAngles - 1,...
+        param.nAngles - 1 + zCounter, zCounter, 0);
+    disp("Number of cylinder faces:");
+    disp(param.nAngles);
+    fprintf(fid, "\t\t);\n");
+    fprintf(fid, "\t}\n");
+    fprintf(fid, ");");
+    disp("Done!");
     fclose(fid); % Close file
