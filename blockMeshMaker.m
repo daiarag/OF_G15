@@ -59,7 +59,7 @@ function [] = blockMeshMaker(param)
     % Vertex determination - cylinder first
     theta = 360 / param.nAngles; % angle increment
     vertices = zeros(16 + 6 * param.nAngles, 3); % Matrix to hold vertices
-    arcCenters = zeros(2 * param.nAngles, 3); % Matrix to hold arc midpoints
+    arcCenters = zeros(2 * param.nAngles, 2); % Matrix to hold arc midpoints
     zCounter = length(vertices) / 2;
     k = 1; % For indexing
     % Circular vertices
@@ -68,13 +68,14 @@ function [] = blockMeshMaker(param)
         vertices(i + 1, :) = [0.5 * cosd(theta * i) ...
             0.5 * sind(theta * i) -0.5];
         arcCenters(i + 1, :) = [0.5 * cosd(theta * (i + 0.5)) ...
-            0.5 * sind(theta * (i + 0.5)) -0.5];
+            0.5 * sind(theta * (i + 0.5))];
         % Outer ring
         vertices(i + param.nAngles + 1, :) = [(0.5 + ...
             param.R) * cosd(theta * i) (0.5 + param.R) * sind(theta...
             * i) -0.5];
-        arcCenters(i + param.nAngles + 1, :) = [0.5 * cosd(theta * (i + 0.5)) ...
-            0.5 * sind(theta * (i + 0.5)) -0.5];
+        arcCenters(i + param.nAngles + 1, :) = [(0.5 + param.R) * ...
+            cosd(theta * (i + 0.5)) (0.5 + param.R) * sind(theta * (i +...
+            0.5))];
     end
     k = k + 2 * (i + 1);
     % Top-back domain vertices
@@ -148,7 +149,7 @@ function [] = blockMeshMaker(param)
     disp("Number of vertices:");
     disp(length(vertices));
     % Uncomment this line to plot points
-    plot(vertices(1:zCounter, 1), vertices(1:zCounter, 2), 'o');
+    % plot(vertices(1:zCounter, 1), vertices(1:zCounter, 2), 'o');
     % Constant lines of every blockMeshDict
     fprintf(fid, "FoamFile\n{\n\tversion:\t2.0;\n\tformat:\tascii;\n"...
         +"\tclass:\tdictionary;\n\tobject:\tblockMeshDict;\n}\n\n");
@@ -298,4 +299,24 @@ function [] = blockMeshMaker(param)
     fprintf(fid, ");\n\n");
     disp("Number of domain edge blocks:");
     disp(param.nAngles + 4);
+    disp("Total number of blocks:");
+    disp(2 * param.nAngles + 4);
+    % Defining curves with arcs
+    fprintf(fid, "edges\n(\n");
+    for i = 0:param.nAngles - 1
+        fprintf(fid, "\tarc %.0f %.0f (%.10f %.10f %.10f);\n", i, mod(i...
+            + 1, param.nAngles), arcCenters(i + 1, :), -0.5);
+        fprintf(fid, "\tarc %.0f %.0f (%.10f %.10f %.10f);\n", i + ...
+            param.nAngles, mod(i + 1, param.nAngles) + param.nAngles, ...
+            arcCenters(i + param.nAngles + 1, :), -0.5);
+        fprintf(fid, "\tarc %.0f %.0f (%.10f %.10f %.10f);\n", i + zCounter, ...
+            mod(i + 1, param.nAngles) + zCounter, arcCenters(i + 1, :),...
+            0.5);
+        fprintf(fid, "\tarc %.0f %.0f (%.10f %.10f %.10f);\n", i + ...
+            param.nAngles + zCounter, mod(i + 1, param.nAngles) + ...
+            param.nAngles + zCounter, arcCenters(i + param.nAngles + 1, :),...
+            0.5);
+    end
+    fprintf(fid, ");\n\n");
+    % Now for faces
     fclose(fid); % Close file
