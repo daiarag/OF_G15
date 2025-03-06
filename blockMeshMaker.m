@@ -202,7 +202,7 @@ function [] = blockMeshMaker(param)
     fprintf(fid, "\thex (%.0f %.0f %.0f %.0f %.0f %.0f %.0f %.0f) (%.0f"...
         + " %.0f 1) simpleGrading (%.10f %.10f 1)\n", stop - param.nAngles...
         - 1, stop - 1, stop, stop + 1, stop - param.nAngles + zCounter - 1,...
-        stop + zCounter - 1, stop + zCounter, stop + zCounter,...
+        stop + zCounter - 1, stop + zCounter, stop + zCounter + 1,...
         param.boxCellCount(2), param.boxCellCount(2), ...
         param.rectExpansion(1), param.rectExpansion(2));
     % Now we move to the left edge of the domain
@@ -354,6 +354,20 @@ function [] = blockMeshMaker(param)
     end
     fprintf(fid, "\t\t);\n");
     fprintf(fid, "\t}\n");
+    fprintf(fid, "\tcylinder\n\t{\n");
+    fprintf(fid, "\t\ttype wall;\n");
+    fprintf(fid, "\t\tfaces\n\t\t(\n");
+    % Cylinder faces
+    for i = 0:param.nAngles - 2
+        fprintf(fid, "\t\t\t(%.0f %.0f %.0f %.0f)\n", i, i + zCounter, i +...
+            1 + zCounter, i + 1);
+    end
+    fprintf(fid, "\t\t\t(%.0f %.0f %.0f %.0f)\n", param.nAngles - 1,...
+        param.nAngles - 1 + zCounter, zCounter, 0);
+    disp("Number of cylinder faces:");
+    disp(param.nAngles);
+    fprintf(fid, "\t\t);\n");
+    fprintf(fid, "\t}\n");
     fprintf(fid, "\ttop\n\t{\n");
     fprintf(fid, "\t\ttype symmetryPlane;\n");
     fprintf(fid, "\t\tfaces\n\t\t(\n");
@@ -383,20 +397,6 @@ function [] = blockMeshMaker(param)
         fprintf(fid, "\t\t\t(%.0f %.0f %.0f %.0f)\n", edge(i), edge(i) +...
             zCounter, edge(i + 1) + zCounter, edge(i + 1));
     end
-    fprintf(fid, "\t\t);\n");
-    fprintf(fid, "\t}\n");
-    fprintf(fid, "\tcylinder\n\t{\n");
-    fprintf(fid, "\t\ttype wall;\n");
-    fprintf(fid, "\t\tfaces\n\t\t(\n");
-    % Cylinder faces
-    for i = 0:param.nAngles - 2
-        fprintf(fid, "\t\t\t(%.0f %.0f %.0f %.0f)\n", i, i + zCounter, i +...
-            1 + zCounter, i + 1);
-    end
-    fprintf(fid, "\t\t\t(%.0f %.0f %.0f %.0f)\n", param.nAngles - 1,...
-        param.nAngles - 1 + zCounter, zCounter, 0);
-    disp("Number of cylinder faces:");
-    disp(param.nAngles);
     fprintf(fid, "\t\t);\n");
     fprintf(fid, "\t}\n");
     fprintf(fid, ");");
