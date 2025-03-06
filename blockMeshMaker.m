@@ -39,9 +39,9 @@ function [] = blockMeshMaker(param)
         param.Lw double {mustBeReal, mustBeFinite, mustBeScalarOrEmpty,...
             mustBePositive} = 6;
         param.R double {mustBeReal, mustBeFinite, mustBeScalarOrEmpty,...
-            mustBePositive} = 1;
+            mustBePositive} = 0.5;
         param.H double {mustBeReal, mustBeFinite, mustBeScalarOrEmpty,...
-            mustBePositive} = 5;
+            mustBePositive} = 4;
         param.boxCellCount (1, 2) double {mustBeRow, mustBeFinite,...
             mustBePositive, mustBeInteger} = [15 30];
     end
@@ -66,13 +66,13 @@ function [] = blockMeshMaker(param)
     for i = 0:param.nAngles - 1
         % Cylinder
         vertices(i + 1, :) = [0.5 * cosd(theta * i) ...
-            0.5 * sind(theta * i) -0.5];
+            0.5 * sind(theta * i) -0.05];
         arcCenters(i + 1, :) = [0.5 * cosd(theta * (i + 0.5)) ...
             0.5 * sind(theta * (i + 0.5))];
         % Outer ring
         vertices(i + param.nAngles + 1, :) = [(0.5 + ...
             param.R) * cosd(theta * i) (0.5 + param.R) * sind(theta...
-            * i) -0.5];
+            * i) -0.05];
         arcCenters(i + param.nAngles + 1, :) = [(0.5 + param.R) * ...
             cosd(theta * (i + 0.5)) (0.5 + param.R) * sind(theta * (i +...
             0.5))];
@@ -83,69 +83,69 @@ function [] = blockMeshMaker(param)
     % Checking when to terminate
     while (cosd(i * theta) > 0)
         vertices(i + k, :) = [param.Lw (0.5 + param.R)...
-            * sind(theta * i) -0.5];
+            * sind(theta * i) -0.05];
         i = i + 1;
     end
     % Top-right corner
-    vertices(i + k, :) = [param.Lw param.H -0.5];
+    vertices(i + k, :) = [param.Lw param.H -0.05];
     k = k + i + 1;
     % Top domain vertices
     if (mod(param.nAngles, 4) == 0)
         for j = 1:-1:-1
             vertices(k + 1 - j, :) = [(0.5 + param.R)...
-                * cosd(90 - theta * j) param.H -0.5];
+                * cosd(90 - theta * j) param.H -0.05];
         end
         k = k + 3;
         i = i + 1;
     else
         vertices(k, :) = [(0.5 + param.R) * cosd(theta...
-            * (i - 1)) param.H -0.5];
+            * (i - 1)) param.H -0.05];
         vertices(k + 1, :) = [(0.5 + param.R) * ...
-            cosd(theta * i) param.H -0.5];
+            cosd(theta * i) param.H -0.05];
         k = k + 2;
     end
     % Front domain vertices
     % Top-left corner
-    vertices(k, :) = [-param.Lf param.H -0.5];
+    vertices(k, :) = [-param.Lf param.H -0.05];
     k = k + 1;
     j = 0;
     while (cosd(i * theta) < 0)
         vertices(j + k, :) = [-param.Lf (0.5 + param.R)...
-            * sind(theta * i) -0.5];
+            * sind(theta * i) -0.05];
         j = j + 1;
         i = i + 1;
     end
     % Bottom-left corner
-    vertices(j + k, :) = [-param.Lf -param.H -0.5];
+    vertices(j + k, :) = [-param.Lf -param.H -0.05];
     k = k + j + 1;
     % Bottom domain vertices
     if (mod(param.nAngles, 4) == 0)
         for j = 1:-1:-1
             vertices(k + 1 - j, :) = [(0.5 + param.R)...
-                * cosd(270 - theta * j) -param.H -0.5];
+                * cosd(270 - theta * j) -param.H -0.05];
         end
         k = k + 3;
         i = i + 1;
     else
         vertices(k, :) = [(0.5 + param.R) * cosd(theta...
-            * (i - 1)) -param.H -0.5];
+            * (i - 1)) -param.H -0.05];
         vertices(k + 1, :) = [(0.5 + param.R) * ...
-            cosd(theta * i) -param.H -0.5];
+            cosd(theta * i) -param.H -0.05];
         k = k + 2;
     end
     % Bottom-right corner
-    vertices(k, :) = [param.Lw -param.H -0.5];
+    vertices(k, :) = [param.Lw -param.H -0.05];
     k = k + 1;
     j = 0;
     % Bottom-back domain vertices
     while (theta * i < 360)
         vertices(k + j, :) = [param.Lw (0.5 + param.R)...
-            * sind(theta * i) -0.5];
+            * sind(theta * i) -0.05];
         i = i + 1;
         j = j + 1;
     end
     vertices(zCounter + 1:end, :) = [vertices(1:zCounter, 1:2) ...
-        0.5 * ones(zCounter, 1)]; % Duplicate for out-of-plane points
+        0.05 * ones(zCounter, 1)]; % Duplicate for out-of-plane points
     disp("Number of vertices:");
     disp(length(vertices));
     % Uncomment this line to plot points
@@ -261,8 +261,8 @@ function [] = blockMeshMaker(param)
         fprintf(fid, "\thex (%.0f %.0f %.0f %.0f %.0f %.0f %.0f"...
             + " %.0f) (%.0f %.0f 1) simpleGrading (%.10f %.10f"... 
             + " 1)\n", i - 1, i, i - 6 - param.nAngles, i - 7 - ...
-            param.nAngles, i - 1 + zCounter, i + zCounter, i - 4 - ...
-            param.nAngles + zCounter, i - 5 - param.nAngles + zCounter, ...
+            param.nAngles, i - 1 + zCounter, i + zCounter, i - 6 - ...
+            param.nAngles + zCounter, i - 7 - param.nAngles + zCounter, ...
             param.rCellCount(2), param.boxCellCount(2), ...
             param.radialExpansion(2), 1 / param.rectExpansion(2));
     end
@@ -305,17 +305,17 @@ function [] = blockMeshMaker(param)
     fprintf(fid, "edges\n(\n");
     for i = 0:param.nAngles - 1
         fprintf(fid, "\tarc %.0f %.0f (%.10f %.10f %.10f)\n", i, mod(i...
-            + 1, param.nAngles), arcCenters(i + 1, :), -0.5);
+            + 1, param.nAngles), arcCenters(i + 1, :), -0.05);
         fprintf(fid, "\tarc %.0f %.0f (%.10f %.10f %.10f)\n", i + ...
             param.nAngles, mod(i + 1, param.nAngles) + param.nAngles, ...
-            arcCenters(i + param.nAngles + 1, :), -0.5);
+            arcCenters(i + param.nAngles + 1, :), -0.05);
         fprintf(fid, "\tarc %.0f %.0f (%.10f %.10f %.10f)\n", i + zCounter, ...
             mod(i + 1, param.nAngles) + zCounter, arcCenters(i + 1, :),...
-            0.5);
+            0.05);
         fprintf(fid, "\tarc %.0f %.0f (%.10f %.10f %.10f)\n", i + ...
             param.nAngles + zCounter, mod(i + 1, param.nAngles) + ...
             param.nAngles + zCounter, arcCenters(i + param.nAngles + 1, :),...
-            0.5);
+            0.05);
     end
     fprintf(fid, ");\n\n");
     % Now for faces - we go from top to bottom, left to right, and CCW for
