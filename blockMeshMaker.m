@@ -10,7 +10,7 @@
 % Lw = wake distance (measured in cylinder diameters) (default is 6)
 % R = radial size (measured in cylinder diameters) (default is 1)
 % H = half-domain height (measured in cylinder diameters) (default is 5)
-% rectExpansion = vector for expansion ratios [horz vert] (z = 1) (default
+% rectExpansion = vector for expansion ratios [fore aft] (z = 1) (default
 % is [4 4])
 % boxCellCount = vector for number of cells fore and aft [fore aft] (z = 1)
 % (default is [15 30])
