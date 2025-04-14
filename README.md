@@ -4,7 +4,7 @@
 This is the central workspace where our team collaborates on OpenFOAM simulations and related assignments.
 
 ## Team Collaboration
-Our team consists of **three members**, and we will be working on separate branches before merging our contributions into the main repository. Each member is responsible for:
+Our team consists of **four members**, and we will be working on separate branches before merging our contributions into the main repository. Each member is responsible for:
 - Developing and testing their assigned components in a **personal branch**.
 - Regularly committing updates and documenting changes.
 - Merging tested and finalized contributions into the **main branch** after review.
