@@ -147,24 +147,19 @@ if __name__ == "__main__":
         [2,4,13,12],
     ])
     #segments per unit length
-    density = 5
-    """
+    density = 50
+    
+    dmax = density
     block_res = []
     for block in blocks_2d:
-        x_len = (points_2d[block[0]][0] - points_2d[block[3][0]] + points_2d[block[1]][0] - points_2d[block[2][0]])/2
-        y_len = ()/2
-        block_res.append([,,1])
+        x_len = (np.abs(points_2d[block[0]][0] - points_2d[block[1]][0]) + np.abs(points_2d[block[2]][0] - points_2d[block[3]][0]))/2
+        y_len = (np.abs(points_2d[block[0]][1] - points_2d[block[3]][1]) + np.abs(points_2d[block[1]][1] - points_2d[block[2]][1]))/2
+        xn = np.round(density*x_len)
+        yn = np.round(density*x_len)
+        dmax = np.min([dmax, x_len / xn, y_len / yn])
+        block_res.append([xn, yn, 1])
     block_res = np.array(block_res)
-    """
-    block_res = np.array([
-        [10,10,1],
-        [10,10,1],
-        [10,10,1],
-        [10,10,1],
-        [10,10,1],
-        [10,10,1],
-        [10,10,1],
-    ])
+    print(f"Min dx is: {dmax}")
 
     #print max density after rounding for courant num
 
