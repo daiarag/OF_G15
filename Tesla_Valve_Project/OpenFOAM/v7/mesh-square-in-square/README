@@ -1,0 +1,10 @@
+
+
+  In this tutorial, we use snappyHexMesh and extrudeMesh
+  to produce a 2D mesh around a square in a square domain.
+  The square has sides of length 1, it is centered at the origin (0,0).
+  The domain is also a square of sides of length 10.
+
+  The square lies in the (x,y) plane with the z coordinate out
+  of the plane.
+

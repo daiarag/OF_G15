@@ -1,0 +1,8 @@
+#!/bin/bash -e
+latex nozzle
+bibtex   nozzle
+latex nozzle
+latex nozzle
+latex nozzle
+dvips nozzle.dvi
+ps2pdf nozzle.ps

@@ -1,0 +1,7 @@
+
+
+  In this tutorial, we use snappyHexMesh to produce a 3D mesh
+  around a cube in a domain that is also a cube. The cube has sides
+  of length 1, it is centered at the origin (0,0,0). The domain
+  is also a cube of sides of length 10.
+
