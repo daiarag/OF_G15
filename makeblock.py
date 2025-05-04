@@ -73,115 +73,161 @@ def arc_from_points(p1, p2, p3):
 
 if __name__ == "__main__":
     graph, write = pull()
-##############################################
-    theta = 3*np.pi/4
-    valve_len = 4 #inner length
-    diameter = 2
+
+    num_valves = 1
+    theta = np.pi/4
+    valve_len = 3 #inner length
+    diameter = 0.5
     end_len = 4
-##############################################
-    
+    density = 20
+
+
     x = valve_len + np.sqrt((diameter**2 - valve_len**2)*np.cos(theta/2)**2 + 2*valve_len*diameter*np.sin(theta/2)*np.cos(theta/2) + valve_len**2)
+    r = valve_len * np.tan(theta / 2)
+    print(r)
+    phi = np.arctan(np.sqrt(diameter**2 + 2*diameter*valve_len*np.tan(theta/2))/r)
     points_2d = np.array([
         [-valve_len - np.sqrt(diameter**2 + 2*diameter*valve_len*np.tan(theta/2)) - end_len, -diameter], #0
         [-valve_len - np.sqrt(diameter**2 + 2*diameter*valve_len*np.tan(theta/2)) - end_len, 0], #1
         [-valve_len - np.sqrt(diameter**2 + 2*diameter*valve_len*np.tan(theta/2)), 0], #2
-        [-valve_len - np.sqrt(diameter**2 + 2*diameter*valve_len*np.tan(theta/2)), -diameter], #3
-        [-valve_len, 0], #4
-        [-valve_len, -diameter], #5
-        [0, 0], #6
-        [diameter/np.tan(theta), -diameter], #7
-        [diameter/np.sin(theta), 0], #8
-        [diameter/np.tan(theta) + diameter/np.sin(theta), -diameter], #9
-        [diameter/np.tan(theta) + diameter/np.sin(theta) + end_len*np.cos(theta), -diameter - end_len*np.sin(theta)], #10
-        [diameter/np.tan(theta) + end_len*np.cos(theta), -diameter - end_len*np.sin(theta)], #11
-        [-valve_len*np.cos(theta) + diameter * np.sin(theta), valve_len*np.sin(theta) + diameter * np.cos(theta)], #12
-        [-valve_len*np.cos(theta), valve_len*np.sin(theta)], #13
-        [-valve_len*(1+np.sin(theta/2)), valve_len*(np.tan(theta/2)+np.sin(theta/2)**2/np.cos(theta/2))], #14
-        [-x, np.tan(theta/2)*x], #15
+        #[-valve_len - np.sqrt(diameter**2 + 2*diameter*valve_len*np.tan(theta/2)), -diameter], #3
+        [-valve_len, 0], #3
+        [-valve_len, -diameter], #4
+        [0, 0], #5
+        [diameter/np.tan(theta), -diameter], #6
+        [diameter/np.sin(theta), 0], #7
+        [diameter/np.tan(theta) + diameter/np.sin(theta), -diameter], #8
+        [diameter/np.tan(theta) + diameter/np.sin(theta) + end_len*np.cos(theta), -diameter - end_len*np.sin(theta)], #9
+        [diameter/np.tan(theta) + end_len*np.cos(theta), -diameter - end_len*np.sin(theta)], #10
+        [-valve_len*np.cos(theta) + diameter * np.sin(theta), valve_len*np.sin(theta) + diameter * np.cos(theta)], #11
+        [-valve_len*np.cos(theta), valve_len*np.sin(theta)], #12
+        [-valve_len*(1+np.sin(theta/2)), valve_len*(np.tan(theta/2)+np.sin(theta/2)**2/np.cos(theta/2))], #13
+        [-x, np.tan(theta/2)*x], #14
+        [-valve_len - r*np.sin(phi), r*(1-np.cos(phi))], #15
+        [-valve_len - r * np.sin(phi / 2), r*(1-np.cos(phi / 2))], #16
+        [-valve_len - (r + diameter) * np.sin(phi / 2), r - (diameter+r)*np.cos(phi / 2), ], #17
+        [-valve_len - r, r], #18
+        [-valve_len - r - diameter, r], #19
+        [-valve_len - r * np.sin(phi / 2), r*(1+np.cos(phi / 2))], #20
+        [-valve_len - (r + diameter) * np.sin(phi / 2), r + (diameter + r)*np.cos(phi / 2)], #21
+        [-valve_len, 2*r], #22
+        [-valve_len, 2*r + diameter], #23
+        [-valve_len + r * np.sin(theta / 2), r*(1+np.cos(theta / 2))], #24
+        [-valve_len + (r + diameter) * np.sin(theta / 2), r+(r + diameter)*np.cos(theta / 2)], #25
     ])
 
     # Define edges as pairs of indices into points
     edges_2d = np.array([
         [0, 1],
         [1, 2],
-        [2, 3],
-        [3, 0],
-        [2, 4],
+        #[2, 3],
+        [4, 0],
+        #[2, 4],
+        #[3, 5],
+        [3, 4],
         [3, 5],
-        [4, 5],
         [4, 6],
+        [5, 6],
         [5, 7],
-        [6, 7],
         [6, 8],
-        [7, 9],
+        [7, 8],
         [8, 9],
+        [6, 10],
         [9, 10],
-        [7, 11],
-        [10, 11],
-        [12, 13],
-        [13, 6],
-        [12, 8],
+        [11, 12],
+        [12, 5],
+        [11, 7],
+        [15, 2],
+        #[16, 4],
+        [14, 13],
+        [23, 22]
     ])
     #arcs are [start, mid, end]
     arcs_2d = np.array([
-        [13, 14, 4],
-        [12, 15, 2],
+        [15, 18, 13],
+        [2, 19, 14],
+        [3, 16, 15],
+        [4, 17, 2],
+        [13, 20, 22],
+        [14, 21, 23],
+        [22, 24, 12],
+        [23, 25, 11],
     ])
 
 # this is very hacky, fix later
     arcs_3d = np.array([
-        [13, 4, 14],
-        [12, 2, 15],
+        [15, 13, 18],
+        [2, 14, 19],
+        [3, 15, 16],
+        [4, 2, 17],
+        [13, 22, 20],
+        [14, 23, 21],
+        [22, 12, 24],
+        [23, 11, 25],
     ])
 
 
 #coutnerclockwise from positive z
 # start at bottom leftmost corner
     blocks_2d = np.array([
-        [0,3,2,1],
-        [3,5,4,2],
-        [5,7,6,4],
-        [7,9,8,6],
-        [11,10,9,7],
-        [6,8,12,13],
-        [2,4,13,12],
+        [0,4,2,1],
+        [4,6,5,3],
+        [6,8,7,5],
+        [10,9,8,6],
+        [5,7,11,12],
+        [22,12,11,23],
+        [14,13,22,23],
+        [2,15,13,14],
+        [4,3,15,2],
     ])
     #segments per unit length
-    density = 50
-    
+    block_res = []
+    for block in blocks_2d:
+        block_res.append([density, density, 1])
+    block_res = np.array(block_res)
+
+    #diam_res = int(round(density*diameter))
+
+    """
     dmax = density
     block_res = []
     for block in blocks_2d:
         x_len = (np.abs(points_2d[block[0]][0] - points_2d[block[1]][0]) + np.abs(points_2d[block[2]][0] - points_2d[block[3]][0]))/2
         y_len = (np.abs(points_2d[block[0]][1] - points_2d[block[3]][1]) + np.abs(points_2d[block[1]][1] - points_2d[block[2]][1]))/2
-        xn = np.round(density*x_len)
-        yn = np.round(density*x_len)
+        xn = int(np.round(density*x_len))
+        yn = int(np.round(density*x_len))
         dmax = np.min([dmax, x_len / xn, y_len / yn])
         block_res.append([xn, yn, 1])
     block_res = np.array(block_res)
     print(f"Min dx is: {dmax}")
-
+    
     #print max density after rounding for courant num
-
+    """
     inlet_2d = np.array([0, 1])
 
-    outlet_2d = np.array([10, 11])
+    outlet_2d = np.array([9, 10])
 
     pipes_2d = np.array([
-        [0, 3],
-        [3, 5],
-        [5, 7],
-        [7, 11],
-        [10, 9],
-        [9, 8],
-        [8, 12],
-        [12, 2],
-        [2, 1],
+        [0, 4],
         [4, 6],
-        [6, 13],
-        [13, 4],
+        [6, 10],
+        [9, 8],
+        [8, 7],
+        [7, 11],
+        [11, 23],
+        [23, 14],
+        [14, 2],
+        [2, 1],
+        [3, 5],
+        [5, 12],
+        [12, 22],
+        [22, 13],
+        [13, 15],
+        [15, 3],
     ])
 
+    
+#PATCH MUST BE FLIPPED FOR OPPOSITE SIDE
 
     if graph:
         fig, ax = plt.subplots()
@@ -205,13 +251,15 @@ if __name__ == "__main__":
         plt.show()
 
     if write:
-        z_value = 0.5
+        z_value = 0.05
         vertices = np.concatenate([np.hstack((points_2d, np.full((points_2d.shape[0], 1), z_value))),  np.hstack((points_2d, np.full((points_2d.shape[0], 1), -z_value)))])
         num_2d = len(points_2d)
-        inlet_3d = np.concatenate([inlet_2d, inlet_2d + num_2d])
-        outlet_3d = np.concatenate([outlet_2d, outlet_2d + num_2d])
-        pipes_3d = np.hstack((pipes_2d, pipes_2d + num_2d))
-        blocks_3d = np.hstack((blocks_2d, blocks_2d + num_2d))
+        inlet_3d = np.concatenate([inlet_2d, inlet_2d[::-1] + num_2d])
+        outlet_3d = np.concatenate([outlet_2d, outlet_2d[::-1] + num_2d])
+        #pipes_3d = np.concatenate([np.hstack((pipes_2d[:, ::-1], pipes_2d + num_2d)), blocks_2d, blocks_2d[:, ::-1] + num_2d])
+        pipes_3d = np.hstack((pipes_2d[:, ::-1], pipes_2d + num_2d))
+        pipes_3d = np.vstack((pipes_3d[:-6], pipes_3d[-6:, ::-1]))
+        blocks_3d = np.hstack((blocks_2d + num_2d, blocks_2d))
         arcs_3d = np.concatenate([arcs_3d, arcs_3d + num_2d])
 
 
