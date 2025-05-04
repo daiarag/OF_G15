@@ -27,21 +27,9 @@ boundaryField
 
     outlet
     {
-        type            fixedValue;
-        value           uniform 0;
+        type            zeroGradient;
     }
-
-    top
-    {
-        type            symmetryPlane;
-    }
-
-    bottom 
-    {
-        type            symmetryPlane;
-    }
-
-    cylinder 
+    pipe 
     {
         type            zeroGradient;
     }
