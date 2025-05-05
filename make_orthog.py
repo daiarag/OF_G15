@@ -225,21 +225,21 @@ if __name__ == "__main__":
     '''
 
     block_res = np.array([
-        [80, 20, 1],
-        [20, 20, 1],
-        [80, 20, 1],
-        [20, 20, 1],
-        [20, 20, 1],
-        [20, 80, 1],
-        [20, 20, 1],
-        [20, 60, 1],
-        [20, 20, 1], #
-        [20, 80, 1],
-        [20, 20, 1],
-        [20, 20, 1],
-        [20, 20, 1],
-        [20, 60, 1],
-        [20, 60, 1],
+        [density*80, density*20, 1],
+        [density*20, density*20, 1],
+        [density*80, density*20, 1],
+        [density*20, density*20, 1],
+        [density*20, density*20, 1],
+        [density*20, density*80, 1],
+        [density*20, density*20, 1],
+        [density*20, density*60, 1],
+        [density*20, density*20, 1], 
+        [density*20, density*80, 1],
+        [density*20, density*20, 1],
+        [density*20, density*20, 1],
+        [density*20, density*20, 1],
+        [density*20, density*60, 1],
+        [density*20, density*60, 1],
     ])
     #diam_res = int(round(density*diameter))
 
