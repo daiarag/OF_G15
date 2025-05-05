@@ -74,11 +74,10 @@ def arc_from_points(p1, p2, p3):
 if __name__ == "__main__":
     graph, write = pull()
 
-    num_valves = 1
-    theta = np.pi/4
-    valve_len = 3 #inner length
-    diameter = 1
-    end_len = 4
+    theta = np.pi/4 #locked
+    valve_len = 4 #locked
+    diameter = 4
+    end_len = 8 #locked
     density = 1
 
     r = valve_len * np.sin(theta) / (1 + np.sin(theta))
@@ -132,6 +131,11 @@ if __name__ == "__main__":
         [c2x - r* np.sin(t1), c2y - r* np.cos(t1)], #34
         [c2x - (r+diameter)* np.sin(t1), c2y - (r+diameter)* np.cos(t1)], #35
     ])
+    print(points_2d[3])
+    print(points_2d[4])
+    print("bottom")
+    print(points_2d[26])
+    print(points_2d[27])
 
     # Define edges as pairs of indices into points
     edges_2d = np.array([
@@ -328,7 +332,7 @@ if __name__ == "__main__":
         arcs_3d = np.concatenate([arcs_3d, arcs_3d + num_2d])
 
 
-        generate_blockMeshDict_template(vertices = vertices, blocks = blocks_3d, edges = arcs_3d, block_res = block_res, inlet_face = inlet_3d, outlet_face = outlet_3d, pipe_faces = pipes_3d)
+        generate_blockMeshDict_template(vertices = vertices, blocks = blocks_3d, edges = arcs_3d, block_res = block_res, inlet_face = outlet_3d, outlet_face = inlet_3d, pipe_faces = pipes_3d)
 
         # REFORMAT EDGES ORDERING
         # func takes [start, end, mid]
