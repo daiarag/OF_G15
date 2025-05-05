@@ -75,11 +75,11 @@ if __name__ == "__main__":
     graph, write = pull()
 
     num_valves = 1
-    theta = np.pi/3
+    theta = np.pi/4
     valve_len = 3 #inner length
     diameter = 1
     end_len = 4
-    density = 20
+    density = 1
 
     r = valve_len * np.sin(theta) / (1 + np.sin(theta))
     t1 = 3*(np.pi/2 + theta)/4
@@ -229,7 +229,7 @@ if __name__ == "__main__":
         [density*20, density*20, 1],
         [density*80, density*20, 1],
         [density*20, density*20, 1],
-        [density*20, density*20, 1],
+        [density*20, density*80, 1],
         [density*20, density*80, 1],
         [density*20, density*20, 1],
         [density*20, density*60, 1],
@@ -237,7 +237,7 @@ if __name__ == "__main__":
         [density*20, density*80, 1],
         [density*20, density*20, 1],
         [density*20, density*20, 1],
-        [density*20, density*20, 1],
+        [density*80, density*20, 1],
         [density*20, density*60, 1],
         [density*20, density*60, 1],
     ])
