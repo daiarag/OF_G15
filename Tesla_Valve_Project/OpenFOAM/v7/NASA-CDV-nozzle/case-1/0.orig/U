@@ -1,0 +1,50 @@
+FoamFile
+{
+        version 2.0;
+        format  ascii;
+        class   volVectorField;
+        object  U;
+}
+// ***************************************************************** //
+
+dimensions      [0 1 -1 0 0 0 0];
+
+internalField   uniform (0 0 0);
+
+boundaryField
+{
+    inlet
+    {
+        type            zeroGradient;
+    }
+
+    outlet
+    {   
+        type            waveTransmissive;
+        field           U;
+        psi             thermo:psi;
+        gamma           1.4;
+        fieldInf        (0.47878 0 0);
+        lInf            1e-1;
+        value           uniform (0.47878 0 0);
+    }
+
+    nozzle
+    {       
+        type            slip;
+    }
+
+    front 
+    {   
+        type            wedge;
+    }   
+
+    back 
+    {   
+        type            wedge;
+    }   
+
+}
+
+
+// ***************************************************************** //	

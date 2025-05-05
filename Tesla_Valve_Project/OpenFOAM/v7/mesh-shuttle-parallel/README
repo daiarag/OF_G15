@@ -1,0 +1,9 @@
+
+
+  In this tutorial, we use snappyHexMesh to produce a 3D mesh
+  around a model of the Space Shuttle. Note that the Shuttle
+  model is based on the shuttle.STEP, which is then meshed
+  by Gmsh to shuttle.stl, stored in compressed format.
+
+  Shuttle model by Grace Kirk
+
