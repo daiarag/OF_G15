@@ -94,9 +94,12 @@ if __name__ == "__main__":
         [-valve_len - diameter, -diameter], #5
         [-valve_len, -diameter], #6
         [diameter/np.tan(theta), -diameter], #7
-        [diameter/np.sin(theta), 0], #8
-        [diameter/np.tan(theta) + diameter/np.sin(theta), -diameter], #9
-        [diameter/np.tan(theta) + diameter/np.sin(theta) + end_len*np.cos(theta), -diameter - end_len*np.sin(theta)], #10
+        #[diameter/np.sin(theta), 0], #8
+        [diameter * np.sin(theta), diameter * np.sin(theta)],
+        #[diameter/np.tan(theta) + diameter/np.sin(theta), -diameter], #9
+        [diameter/np.tan(theta)+ diameter * np.sin(theta), -diameter + diameter * np.sin(theta)], #9
+        #[diameter/np.tan(theta) + diameter/np.sin(theta) + end_len*np.cos(theta), -diameter - end_len*np.sin(theta)], #10
+        [diameter/np.tan(theta) + end_len*np.cos(theta) + diameter * np.sin(theta), -diameter - end_len*np.sin(theta) + diameter * np.sin(theta)], #10
         [diameter/np.tan(theta) + end_len*np.cos(theta), -diameter - end_len*np.sin(theta)], #11
         [-valve_len + r + r*np.sin(theta), r*np.cos(theta)], #12
         [-valve_len + r + (r+diameter)*np.sin(theta), (r+diameter)*np.cos(theta)], #13
@@ -161,11 +164,24 @@ if __name__ == "__main__":
         [17, 16, 12, 13],
     ])
     #segments per unit length
+    '''
     block_res = []
     for block in blocks_2d:
         block_res.append([density, density, 1])
     block_res = np.array(block_res)
+    '''
 
+    block_res = np.array([
+        [80, 20, 1],
+        [20, 20, 1],
+        [80, 20, 1],
+        [20, 20, 1],
+        [20, 20, 1],
+        [20, 80, 1],
+        [20, 20, 1],
+        [20, 60, 1],
+        [20, 60, 1],
+    ])
     #diam_res = int(round(density*diameter))
 
     """
