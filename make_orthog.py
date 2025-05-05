@@ -75,7 +75,7 @@ if __name__ == "__main__":
     graph, write = pull()
 
     num_valves = 1
-    theta = np.pi/4
+    theta = np.pi/3
     valve_len = 3 #inner length
     diameter = 1
     end_len = 4
@@ -85,6 +85,10 @@ if __name__ == "__main__":
     t1 = 3*(np.pi/2 + theta)/4
     t2 = (np.pi/2 + theta)/2
     t3 = (np.pi/2 + theta)/4
+    y2 =  -diameter - (end_len+diameter+valve_len)*np.sin(theta)
+    x2 = diameter/np.tan(theta) + (end_len+diameter+valve_len)*np.cos(theta)
+    c2x = x2 - (valve_len - r)*np.cos(theta)
+    c2y = y2 + (valve_len - r)*np.sin(theta)
     points_2d = np.array([
         [0, 0], #0
         [-valve_len, 0], #1
@@ -95,11 +99,11 @@ if __name__ == "__main__":
         [-valve_len, -diameter], #6
         [diameter/np.tan(theta), -diameter], #7
         #[diameter/np.sin(theta), 0], #8
-        [diameter * np.sin(theta), diameter * np.sin(theta)],
+        [diameter * np.sin(theta), diameter * np.cos(theta)], #8
         #[diameter/np.tan(theta) + diameter/np.sin(theta), -diameter], #9
-        [diameter/np.tan(theta)+ diameter * np.sin(theta), -diameter + diameter * np.sin(theta)], #9
+        [diameter/np.tan(theta)+ diameter * np.sin(theta), -diameter + diameter * np.cos(theta)], #9
         #[diameter/np.tan(theta) + diameter/np.sin(theta) + end_len*np.cos(theta), -diameter - end_len*np.sin(theta)], #10
-        [diameter/np.tan(theta) + end_len*np.cos(theta) + diameter * np.sin(theta), -diameter - end_len*np.sin(theta) + diameter * np.sin(theta)], #10
+        [diameter/np.tan(theta) + end_len*np.cos(theta) + diameter * np.sin(theta), -diameter - end_len*np.sin(theta) + diameter * np.cos(theta)], #10
         [diameter/np.tan(theta) + end_len*np.cos(theta), -diameter - end_len*np.sin(theta)], #11
         [-valve_len + r + r*np.sin(theta), r*np.cos(theta)], #12
         [-valve_len + r + (r+diameter)*np.sin(theta), (r+diameter)*np.cos(theta)], #13
@@ -109,6 +113,24 @@ if __name__ == "__main__":
         [-valve_len + r - (r + diameter)*np.cos(t2), (r + diameter)*np.sin(t2)], #17
         [-valve_len + r - r*np.cos(t3), r*np.sin(t3)], #18
         [-valve_len + r - (r + diameter)*np.cos(t3), (r + diameter)*np.sin(t3)], #19
+
+        [diameter/np.tan(theta) + (end_len+diameter)*np.cos(theta) + diameter * np.sin(theta), -diameter - (end_len+diameter)*np.sin(theta) + diameter * np.cos(theta)], #20
+        [diameter/np.tan(theta) + (end_len+diameter)*np.cos(theta), -diameter - (end_len+diameter)*np.sin(theta)], #21
+        [x2, y2], #22
+        [x2 + diameter / np.sin(theta), y2], #23
+        [x2, y2 - diameter], #24
+        [x2 + diameter / np.sin(theta), y2 - diameter], #25
+        [x2 + diameter / np.cos(theta) + end_len, y2], #26
+        [x2 + diameter / np.cos(theta) + end_len, y2 - diameter], #27
+        [c2x, y2], #28
+        [c2x, y2 - diameter], #29
+        [c2x, c2y], 
+        [c2x - r* np.sin(t3), c2y - r* np.cos(t3)], #30
+        [c2x - (r+diameter)* np.sin(t3), c2y - (r+diameter)* np.cos(t3)], #31
+        [c2x - r* np.sin(t2), c2y - r* np.cos(t2)], #32
+        [c2x - (r+diameter)* np.sin(t2), c2y - (r+diameter)* np.cos(t2)], #33
+        [c2x - r* np.sin(t1), c2y - r* np.cos(t1)], #34
+        [c2x - (r+diameter)* np.sin(t1), c2y - (r+diameter)* np.cos(t1)], #35
     ])
 
     # Define edges as pairs of indices into points
@@ -133,6 +155,22 @@ if __name__ == "__main__":
         [8, 13],
         [12, 13],
         [17, 16],
+        [20, 21],
+        [11, 21],
+        [10, 20],
+        [21, 22],
+        [20, 23],
+        [22, 23],
+        [23, 25],
+        [22, 24],
+        [24, 25],
+        [23, 26],
+        [25, 27],
+        [26, 27],
+        [22, 28],
+        [24, 29],
+        [28, 29],
+        [34, 33]
     ])
     #arcs are [start, mid, end]
     arcs_2d = np.array([
@@ -140,6 +178,10 @@ if __name__ == "__main__":
         [2, 19, 17],
         [16, 14, 12],
         [17, 15, 13],
+        [28, 31, 33],
+        [29, 32, 34],
+        [33, 35, 21],
+        [34, 36, 11],
     ])
 
 # this is very hacky, fix later
@@ -148,6 +190,10 @@ if __name__ == "__main__":
         [2, 17, 19],
         [16, 12, 14],
         [17, 13, 15],
+        [28, 33, 31],
+        [29, 34, 32],
+        [33, 21, 35],
+        [34, 11, 36],
     ])
 
 
@@ -162,6 +208,13 @@ if __name__ == "__main__":
         [0, 8, 13, 12],
         [2, 1, 16, 17],
         [17, 16, 12, 13],
+        [21, 20, 10, 11], #
+        [22, 23, 20, 21],
+        [24, 25, 23, 22],
+        [29, 24, 22, 28],
+        [25, 27, 26, 23],
+        [29, 28, 33, 34],
+        [34, 33, 21, 11], #
     ])
     #segments per unit length
     '''
@@ -178,6 +231,12 @@ if __name__ == "__main__":
         [20, 20, 1],
         [20, 20, 1],
         [20, 80, 1],
+        [20, 20, 1],
+        [20, 60, 1],
+        [20, 20, 1], #
+        [20, 80, 1],
+        [20, 20, 1],
+        [20, 20, 1],
         [20, 20, 1],
         [20, 60, 1],
         [20, 60, 1],
@@ -201,7 +260,7 @@ if __name__ == "__main__":
     """
     inlet_2d = np.array([4, 3])
 
-    outlet_2d = np.array([10, 11])
+    outlet_2d = np.array([26, 27])
 
     pipes_2d = np.array([
         [4, 5],
@@ -214,6 +273,18 @@ if __name__ == "__main__":
         [13, 17],
         [17, 2],
         [2, 3],
+        [11, 34],
+        [34, 29],
+        [29, 24],
+        [24, 25],
+        [25, 27],
+        [26, 23],
+        [23, 20],
+        [20, 10],
+        [28, 22],
+        [22, 21],
+        [21, 33],
+        [33, 28],
         [1, 0],
         [0, 12],
         [12, 16],
@@ -252,7 +323,7 @@ if __name__ == "__main__":
         outlet_3d = np.concatenate([outlet_2d, outlet_2d[::-1] + num_2d])
         #pipes_3d = np.concatenate([np.hstack((pipes_2d[:, ::-1], pipes_2d + num_2d)), blocks_2d, blocks_2d[:, ::-1] + num_2d])
         pipes_3d = np.hstack((pipes_2d[:, ::-1], pipes_2d + num_2d))
-        pipes_3d = np.vstack((pipes_3d[:-6], pipes_3d[-6:, ::-1]))
+        pipes_3d = np.vstack((pipes_3d[:-8], pipes_3d[-8:, ::-1]))
         blocks_3d = np.hstack((blocks_2d + num_2d, blocks_2d))
         arcs_3d = np.concatenate([arcs_3d, arcs_3d + num_2d])
 
